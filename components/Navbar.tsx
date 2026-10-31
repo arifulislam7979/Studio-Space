@@ -35,6 +35,7 @@ export default function Navbar() {
     { name: "How It Works", href: "/#how-it-works" },
     { name: "About Us", href: "/#about-us" },
   ];
+ 
 
   return (
     <header className="sticky top-0 z-50 transition-all bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800/80 duration-300">
@@ -88,7 +89,12 @@ export default function Navbar() {
               )}
             </button>
 
-            { user ? (
+            {isPending ? (
+              <div className="flex items-center gap-2.5 p-1.5 animate-pulse">
+                <div className="w-9 h-9 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+                <div className="w-24 h-4 rounded-md bg-zinc-200 dark:bg-zinc-800" />
+              </div>
+            ) : user ? (
               /* Authenticated User Avatar Display */
               <div>
                 <UserInfo user={user}></UserInfo>
