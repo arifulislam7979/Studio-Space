@@ -58,7 +58,7 @@ const UserInfo = ({ user }: UserInfoProps) => {
             <Avatar className="w-9 h-9 border-2 border-indigo-500/30 group-hover:border-indigo-600 dark:group-hover:border-indigo-400 transition-all">
               <AvatarImage
                 referrerPolicy="no-referrer"
-                src={user?.image || ""}
+                src={user?.image || "U"}
                 alt={user?.name || "User Avatar"}
               />
               <AvatarFallback className="bg-indigo-600 text-white font-semibold text-xs">
@@ -106,7 +106,7 @@ const UserInfo = ({ user }: UserInfoProps) => {
             </Link>
 
             <Link
-              href="/my-studios"
+              href="/my-listings"
               className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
             >
               <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -114,7 +114,7 @@ const UserInfo = ({ user }: UserInfoProps) => {
             </Link>
 
             <Link
-              href="/my-booking"
+              href="/my-bookings"
               className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
             >
               <CalendarCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
