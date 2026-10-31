@@ -7,7 +7,8 @@ import {
   Camera,
   MapPin,
   DollarSign,
-  FileText,
+  Users,
+  ShieldAlert,
   Image as ImageIcon,
   CheckCircle2,
   Loader2,
@@ -17,9 +18,12 @@ import {
   Volume2,
   Sun,
   ShieldCheck,
+  User,
+  Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
 
 const AMENITIES_OPTIONS = [
   { id: "wifi", label: "High-speed Wi-Fi", icon: Wifi },
@@ -29,21 +33,25 @@ const AMENITIES_OPTIONS = [
 ];
 
 const CATEGORIES = [
-  "Photography Studio",
-  "Music & Recording Studio",
-  "Podcast & Broadcast Studio",
-  "Video Production & Cinema",
-  "Dance & Rehearsal Space",
-  "Art & Content Creation",
+  "Photo Studio",
+  "Film Stage",
+  "Podcast Lounge",
+  "Music Suite",
+  "Workshop",
+  "Creative Coworking",
 ];
 
 export default function AddStudiosPage() {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
 
   const [formData, setFormData] = useState({
     title: "",
     category: "",
     price: "",
+    securityDeposit: "",
+    maxCapacity: "",
     location: "",
     description: "",
     imageUrl: "",
@@ -53,7 +61,9 @@ export default function AddStudiosPage() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     setFormData({
       ...formData,
@@ -76,72 +86,47 @@ export default function AddStudiosPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Condition 1: Title Validation
-    if (formData.title.trim().length < 4) {
-      toast.error("Studio title must be at least 4 characters long.");
-      return;
-    }
-
-    // Condition 2: Category Validation
-    if (!formData.category) {
-      toast.error("Please select a studio category.");
-      return;
-    }
-
-    // Condition 3: Price Validation
-    const priceNum = parseFloat(formData.price);
-    if (isNaN(priceNum) || priceNum <= 0) {
-      toast.error("Please enter a valid hourly rate (greater than 0).");
-      return;
-    }
-
-    // Condition 4: Location Validation
-    if (!formData.location.trim()) {
-      toast.error("Location address is required.");
-      return;
-    }
-
-    // Condition 5: Description Validation
-    if (formData.description.trim().length < 20) {
-      toast.error("Description must be at least 20 characters to inform bookers well.");
-      return;
-    }
-
     setLoading(true);
 
-    try {
-      // Backend / API Integration goes here (e.g., fetch('/api/studios', ...))
-      console.log("Submitting Studio Data:", formData);
+    const studioUser = {
+      ...formData,
+      userName: user?.name,
+      userEmail: user?.email,
+    };
 
-      // Simulate Request
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+    const res = await fetch("http://localhost:5000/add-studio", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(studioUser),
+    });
+    const result = await res.json();
 
+    if (result.insertedId) {
       toast.success("Studio space listed successfully!");
-      router.push("/my-studios");
-    } catch (error) {
-      console.error(error);
+      // router.push("/my-listings");
+    } else {
       toast.error("Failed to add studio. Please try again.");
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 py-10 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-3xl mx-auto space-y-6">
-        
         {/* Back Link */}
         <Link
-          href="/my-studios"
+          href="/my-listings"
           className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to My Studios</span>
+          <span>Back to My Listings</span>
         </Link>
 
         {/* Form Container Card */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-10 shadow-xl space-y-8">
-          
           {/* Header */}
           <div className="space-y-2 text-center sm:text-left border-b border-zinc-100 dark:border-zinc-800/80 pb-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-xs font-semibold">
@@ -152,13 +137,32 @@ export default function AddStudiosPage() {
               Add New Studio
             </h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Fill in the details below to list your studio space on StudioSpace for creators to book.
+              Fill in the details below to list your studio space on StudioSpace
+              for creators to book.
             </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            
+            {/* Read-Only User Information Section */}
+            <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-950/70 border border-zinc-200 dark:border-zinc-800 space-y-3">
+              <p className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                Host Account Details (Read-Only)
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-center gap-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  <User className="w-4 h-4 text-indigo-500" />
+                  <span>Name: {user?.name || "Loading..."}</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate">
+                  <Mail className="w-4 h-4 text-indigo-500" />
+                  <span className="truncate">
+                    Email: {user?.email || "Loading..."}
+                  </span>
+                </div>
+              </div>
+            </div>
+
             {/* Title Field */}
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
@@ -180,34 +184,39 @@ export default function AddStudiosPage() {
               </div>
             </div>
 
-            {/* Grid for Category & Price */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              
-              {/* Category */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-                  Category <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="category"
-                  required
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
-                >
-                  <option value="" disabled>Select category</option>
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat} className="bg-white dark:bg-zinc-900">
-                      {cat}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            {/* Category */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                Category <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="category"
+                required
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              >
+                <option value="" disabled>
+                  Select category
+                </option>
+                {CATEGORIES.map((cat) => (
+                  <option
+                    key={cat}
+                    value={cat}
+                    className="bg-white dark:bg-zinc-900"
+                  >
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
 
+            {/* Grid for Price, Security Deposit & Max Capacity */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Hourly Price */}
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-                  Price per Hour ($ USD) <span className="text-red-500">*</span>
+                  Price/Hour ($) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
@@ -216,8 +225,6 @@ export default function AddStudiosPage() {
                   <input
                     type="number"
                     name="price"
-                    min="1"
-                    step="any"
                     required
                     value={formData.price}
                     onChange={handleChange}
@@ -227,6 +234,49 @@ export default function AddStudiosPage() {
                 </div>
               </div>
 
+              {/* Security Deposit */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                  Security Deposit ($) <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
+                    <ShieldAlert className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="number"
+                    name="securityDeposit"
+                    min="0"
+                    required
+                    value={formData.securityDeposit}
+                    onChange={handleChange}
+                    placeholder="e.g., 100"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-sm placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Max Capacity */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                  Max Capacity <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
+                    <Users className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="number"
+                    name="maxCapacity"
+                    min="1"
+                    required
+                    value={formData.maxCapacity}
+                    onChange={handleChange}
+                    placeholder="e.g., 10"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-sm placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Location Address */}
@@ -270,10 +320,11 @@ export default function AddStudiosPage() {
               </div>
             </div>
 
-            {/* Description */}
+            {/* Description / Overview */}
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-                Description <span className="text-red-500">*</span>
+                Detailed Overview / Description{" "}
+                <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <textarea
@@ -311,7 +362,9 @@ export default function AddStudiosPage() {
                     >
                       <Icon className="w-4 h-4 shrink-0" />
                       <span className="flex-1">{item.label}</span>
-                      {isChecked && <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />}
+                      {isChecked && (
+                        <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                      )}
                     </button>
                   );
                 })}
@@ -338,10 +391,8 @@ export default function AddStudiosPage() {
                 )}
               </Button>
             </div>
-
           </form>
         </div>
-
       </div>
     </div>
   );
