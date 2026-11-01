@@ -35,15 +35,14 @@ export default function MyListingPage() {
       method: "DELETE",
     });
     const result = await res.json()
-    console.log(result)
-
-    // if (res.ok) {
-    //   toast.success("Studio deleted successfully!");
-    //   setListings(listings.filter((item) => item._id !== id));
-    //   setDeleteId(null);
-    // } else {
-    //   toast.error("Failed to delete studio.");
-    // }
+    
+    if (result.deletedCount > 0) {
+      toast.success("Studio deleted successfully!");
+      setListings(listings.filter((item) => item._id !== id));
+      setDeleteId(null);
+    } else {
+      toast.error("Failed to delete studio.");
+    }
   };
 
   if (loading) {
