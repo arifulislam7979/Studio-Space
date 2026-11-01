@@ -92,6 +92,7 @@ export default function AddStudiosPage() {
       ...formData,
       userName: user?.name,
       userEmail: user?.email,
+      userImage: user?.image
     };
 
     const res = await fetch("http://localhost:5000/add-studio", {

@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import GoogleIcon from "@/components/GoogleIcon";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -25,6 +26,7 @@ export default function SignInPage() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [googleLoading, setGoogleLoading] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -55,10 +57,24 @@ export default function SignInPage() {
     }
   };
 
+  // Google Social Sign-In Handler
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      await signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+    } catch (e) {
+      toast.error( "Google Sign-In Failed. Try again.",);
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 transition-colors">
-      <div className="max-w-md w-full space-y-8 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 rounded-3xl shadow-2xl">
-        
+      <div className="max-w-md w-full space-y-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 rounded-3xl shadow-2xl">
         {/* Header / Brand Logo */}
         <div className="text-center space-y-3">
           <Link
@@ -75,9 +91,32 @@ export default function SignInPage() {
           </p>
         </div>
 
+        {/* Google Sign In Button */}
+        <Button
+          type="button"
+          variant="outline"
+          disabled={googleLoading || loading}
+          onClick={handleGoogleSignIn}
+          className="w-full py-6 rounded-xl border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-medium text-sm flex items-center justify-center gap-3 transition-all cursor-pointer"
+        >
+          {googleLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />
+          ) : (
+            <GoogleIcon></GoogleIcon>
+          )}
+          <span>Continue with Google</span>
+        </Button>
+
+        {/* Divider */}
+        <div className="relative flex items-center justify-center my-2">
+          <div className="border-t border-zinc-200 dark:border-zinc-800 w-full" />
+          <span className="bg-zinc-50 dark:bg-zinc-900 px-3 text-xs text-zinc-400 uppercase tracking-wider absolute">
+            Or continue with email
+          </span>
+        </div>
+
         {/* Sign In Form */}
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-          
           {/* Email Field */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
@@ -100,7 +139,7 @@ export default function SignInPage() {
             </div>
           </div>
 
-          {/* Password Field with Eye Toggle */}
+          {/* Password Field */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
@@ -142,10 +181,10 @@ export default function SignInPage() {
             </div>
           </div>
 
-          {/* Submit Button using Shadcn Button */}
+          {/* Submit Button */}
           <Button
             type="submit"
-            disabled={loading}
+            disabled={loading || googleLoading}
             className="w-full mt-3 py-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             {loading ? (

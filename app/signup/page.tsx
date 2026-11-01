@@ -14,16 +14,19 @@ import {
   EyeOff,
   Check,
   X,
+  ImageIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import { signUp } from "@/lib/auth-client";
+import { signIn, signUp } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import GoogleIcon from "@/components/GoogleIcon";
 
 export default function SignUpPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    image: "",
     password: "",
     confirmPassword: "",
   });
@@ -31,6 +34,7 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [googleLoading, setGoogleLoading] = useState<boolean>(false);
 
   // Password Validation Conditions
   const hasMinLength = formData.password.length >= 6;
@@ -63,8 +67,9 @@ export default function SignUpPage() {
       email: formData.email,
       password: formData.password,
       name: formData.name,
+      image: formData.image
     });
-    
+
     setLoading(false);
 
     if (data) {
@@ -75,11 +80,23 @@ export default function SignUpPage() {
       toast.error(error.message || "Sign Up Failed");
     }
   };
+  const handleGoogleSignUp = async () => {
+    setGoogleLoading(true);
+    try {
+      await signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+    } catch (e) {
+      toast.error("Google Sign-In Failed. Try again.");
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 transition-colors">
       <div className="max-w-md w-full space-y-8 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 rounded-3xl shadow-2xl">
-        
         {/* Header / Brand Logo */}
         <div className="text-center space-y-3">
           <Link
@@ -96,9 +113,29 @@ export default function SignUpPage() {
           </p>
         </div>
 
-        {/* Signup Form */}
+        <Button
+          type="button"
+          variant="outline"
+          disabled={googleLoading}
+          onClick={handleGoogleSignUp}
+          className="w-full py-6 rounded-xl border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-medium text-sm flex items-center justify-center gap-3 transition-all cursor-pointer"
+        >
+          {googleLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />
+          ) : (
+            <GoogleIcon></GoogleIcon>
+          )}
+          <span>Continue with Google</span>
+        </Button>
+
+        {/* Divider */}
+        <div className="relative flex items-center justify-center my-2">
+          <div className="border-t border-zinc-200 dark:border-zinc-800 w-full" />
+          <span className="bg-zinc-50 dark:bg-zinc-900 px-3 text-xs text-zinc-400 uppercase tracking-wider absolute">
+            Or continue with email
+          </span>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-          
           {/* Full Name Field */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
@@ -141,6 +178,24 @@ export default function SignUpPage() {
               />
             </div>
           </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+              Image Address
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
+                <ImageIcon className="w-4 h-4" />
+              </div>
+              <input
+                type="url"
+                name="image"
+                value={formData.image}
+                onChange={handleChange}
+                placeholder="Image URL"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
+              />
+            </div>
+          </div>
 
           {/* Password Field with Eye Toggle */}
           <div className="space-y-1.5">
@@ -179,7 +234,9 @@ export default function SignUpPage() {
             <div className="space-y-1 pt-1 text-xs">
               <div
                 className={`flex items-center gap-1.5 ${
-                  hasMinLength ? "text-emerald-500 dark:text-emerald-400" : "text-zinc-400 dark:text-zinc-500"
+                  hasMinLength
+                    ? "text-emerald-500 dark:text-emerald-400"
+                    : "text-zinc-400 dark:text-zinc-500"
                 }`}
               >
                 {hasMinLength ? (
@@ -191,7 +248,9 @@ export default function SignUpPage() {
               </div>
               <div
                 className={`flex items-center gap-1.5 ${
-                  hasUppercase ? "text-emerald-500 dark:text-emerald-400" : "text-zinc-400 dark:text-zinc-500"
+                  hasUppercase
+                    ? "text-emerald-500 dark:text-emerald-400"
+                    : "text-zinc-400 dark:text-zinc-500"
                 }`}
               >
                 {hasUppercase ? (
@@ -203,7 +262,9 @@ export default function SignUpPage() {
               </div>
               <div
                 className={`flex items-center gap-1.5 ${
-                  hasNumber ? "text-emerald-500 dark:text-emerald-400" : "text-zinc-400 dark:text-zinc-500"
+                  hasNumber
+                    ? "text-emerald-500 dark:text-emerald-400"
+                    : "text-zinc-400 dark:text-zinc-500"
                 }`}
               >
                 {hasNumber ? (

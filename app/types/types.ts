@@ -11,4 +11,5 @@ export interface Istudio {
   amenities: string[];
   userName: string;
   userEmail: string;
+  userImage: string;
 }
