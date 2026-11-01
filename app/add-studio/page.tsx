@@ -106,7 +106,7 @@ export default function AddStudiosPage() {
 
     if (result.insertedId) {
       toast.success("Studio space listed successfully!");
-      // router.push("/my-listings");
+      router.push("/my-listings");
     } else {
       toast.error("Failed to add studio. Please try again.");
     }

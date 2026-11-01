@@ -43,7 +43,7 @@ export default function BookingBox({ studio }: BookingBoxProps) {
     e.preventDefault();
     setLoading(true);
 
-    const payload = {
+    const bookingsData = {
       studioId,
       studioTitle,
       date: bookingData.date,
@@ -52,33 +52,23 @@ export default function BookingBox({ studio }: BookingBoxProps) {
       securityDeposit,
       totalPrice: grandTotal,
       userName: session?.user?.name,
-      userEmail: session?.user?.email ,
+      userEmail: session?.user?.email,
       status: "pending",
     };
-
-    try {
-      const res = await fetch("http://localhost:5000/add-booking", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await res.json();
-
-      if (result.insertedId || res.ok) {
-        toast.success("Workspace booked successfully!");
-        setIsModalOpen(false);
-        router.push("/my-bookings");
-      } else {
-        toast.error("Failed to book workspace. Please try again.");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong. Check your server connection.");
-    } finally {
-      setLoading(false);
+    const res = await fetch("http://localhost:5000/add-bookings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bookingsData),
+    });
+    const result = await res.json();
+    if (result.insertedId) {
+      toast.success("Booking confirmed!");
+      setIsModalOpen(false);
+      router.push('/my-bookings')
+    } else {
+      toast.error("Failed to book workspace. Please try again.");
     }
   };
 
