@@ -5,18 +5,31 @@ import {
   Users,
   ShieldAlert,
   ArrowRight,
-  Sparkles,
   Layers,
+  Star,
+  Sparkles,
   Loader2,
 } from "lucide-react";
 import { Istudio } from "../types/types"; 
+import Image from "next/image";
 import { Suspense } from "react";
 
-const DataChild = async () => {
+interface DataChildProps {
+  searchParams: Promise<{ category?: string }>;
+}
+
+const DataChild = async ({ searchParams }: DataChildProps) => {
+  const { category } = await searchParams;
+
   let studios: Istudio[] = [];
 
   try {
-    const res = await fetch("http://localhost:5000/add-studio", {
+    let url = "http://localhost:5000/add-studio";
+    if (category) {
+      url += `?category=${encodeURIComponent(category)}`;
+    }
+
+    const res = await fetch(url, {
       cache: "no-store",
     });
     studios = await res.json();
@@ -25,29 +38,50 @@ const DataChild = async () => {
   }
 
   // Condition: If no studios found
-  if (studios.length === 0) {
+  if (!studios || studios.length === 0) {
     return (
       <div className="text-center py-20 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl space-y-4">
         <Layers className="w-12 h-12 text-zinc-400 mx-auto" />
         <h3 className="text-lg font-bold">No Studios Available Yet</h3>
         <p className="text-sm text-zinc-500">
-          Check back later or list your own studio space.
+          {category ? `No studios found for "${category}".` : "Check back later or list your own studio space."}
         </p>
-        <Link
-          href="/add-studio"
-          className="inline-block px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-md hover:bg-indigo-500 transition"
-        >
-          Add New Studio
-        </Link>
+        <div className="flex justify-center gap-3 pt-2">
+          {category && (
+            <Link
+              href="/studios"
+              className="inline-block px-5 py-2.5 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold hover:bg-zinc-300 dark:hover:bg-zinc-700 transition"
+            >
+              Clear Filter
+            </Link>
+          )}
+          <Link
+            href="/add-studio"
+            className="inline-block px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-md hover:bg-indigo-500 transition"
+          >
+            Add New Studio
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Total Count Badge */}
-      <div className="flex justify-end">
-        <div className="text-xs font-semibold px-4 py-2 rounded-xl bg-zinc-200/60 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+      {/* Filter Status & Total Count Badge */}
+      <div className="flex justify-between items-center flex-wrap gap-2">
+        {category ? (
+          <div className="text-xs font-semibold px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900">
+            Filtered by Category: <span className="underline">{category}</span>
+            <Link href="/studios" className="ml-3 text-red-500 hover:underline">
+              [Clear]
+            </Link>
+          </div>
+        ) : (
+          <div />
+        )}
+
+        <div className="text-xs font-semibold px-4 py-2 rounded-xl bg-zinc-200/60 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 ml-auto">
           Total Studios: {studios.length}
         </div>
       </div>
@@ -63,9 +97,10 @@ const DataChild = async () => {
               {/* Studio Image Container */}
               <div className="relative h-48 w-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                 {studio.imageUrl ? (
-                  <img
+                  <Image
                     src={studio.imageUrl}
                     alt={studio.title}
+                    fill
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
@@ -77,6 +112,12 @@ const DataChild = async () => {
                 <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-semibold">
                   {studio.category}
                 </span>
+
+                {/* Rating Badge (Fallback to 4.9 if rating doesn't exist) */}
+                <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-bold text-zinc-800 dark:text-zinc-200 shadow-sm">
+                  <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                  <span>{studio.rating ? studio.rating.toFixed(1) : "4.9"}</span>
+                </div>
               </div>
 
               {/* Content Info */}
@@ -138,7 +179,8 @@ const DataChild = async () => {
 };
 
 
-const StudiosPage = () => {
+
+const StudiosPage = ({searchParams}:DataChildProps) => {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 py-10 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -170,7 +212,7 @@ const StudiosPage = () => {
             </div>
           }
         >
-          <DataChild />
+          <DataChild  searchParams={searchParams}/>
         </Suspense>
       </div>
     </div>

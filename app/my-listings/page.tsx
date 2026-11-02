@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { Istudio } from "../types/types";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Plus, AlertCircle, Users, Loader2 } from "lucide-react";
+import { MapPin, Plus, AlertCircle, Users, Star, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ListingActions from "@/components/ListingActions";
 import { Suspense } from "react";
@@ -79,12 +79,19 @@ const MyListingsContent = async () => {
                         No Image
                       </div>
                     )}
+                    
                     {/* Category Badge on Image */}
                     {studio.category && (
                       <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold uppercase tracking-wider">
                         {studio.category}
                       </span>
                     )}
+
+                    {/* Rating Badge (Fallback to 4.9 if rating doesn't exist) */}
+                    <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-bold text-zinc-800 dark:text-zinc-200 shadow-sm">
+                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                      <span>{studio.rating ? studio.rating.toFixed(1) : "4.9"}</span>
+                    </div>
                   </div>
 
                   <div className="p-5 space-y-3">
@@ -130,7 +137,6 @@ const MyListingsContent = async () => {
     </div>
   );
 };
-
 
 
 export default function MyListingsPage() {

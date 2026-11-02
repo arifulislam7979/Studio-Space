@@ -8,12 +8,14 @@ import {
   ArrowLeft,
   CheckCircle2,
   User,
+  Star,
   Loader2,
 } from "lucide-react";
 import { Istudio } from "@/app/types/types";
 import { Suspense } from "react";
-import BookingBox from "@/components/BookingBox"; 
+import BookingBox from "@/components/BookingBox";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -25,8 +27,11 @@ async function StudioDetailContent({ params }: PageProps) {
     cache: "no-store",
   });
 
+  if (!res.ok) {
+    notFound();
+  }
+
   const studio: Istudio = await res.json();
- 
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 py-10 px-4 sm:px-6 lg:px-8 transition-colors">
@@ -72,7 +77,9 @@ async function StudioDetailContent({ params }: PageProps) {
                 <span>{studio?.location}</span>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+              {/* 4 Cards Grid including Rating */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                {/* Max Capacity */}
                 <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-center">
                   <Users className="w-4 h-4 text-indigo-500 mx-auto mb-1" />
                   <span className="text-xs text-zinc-400 block">
@@ -83,6 +90,16 @@ async function StudioDetailContent({ params }: PageProps) {
                   </span>
                 </div>
 
+                {/* Rating Box */}
+                <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-center">
+                  <Star className="w-4 h-4 text-amber-500 fill-amber-500 mx-auto mb-1" />
+                  <span className="text-xs text-zinc-400 block">Rating</span>
+                  <span className="text-sm font-bold text-amber-600 dark:text-amber-400">
+                    {studio?.rating ? studio.rating.toFixed(1) : "4.9"} / 5.0
+                  </span>
+                </div>
+
+                {/* Security Deposit */}
                 <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-center">
                   <ShieldAlert className="w-4 h-4 text-indigo-500 mx-auto mb-1" />
                   <span className="text-xs text-zinc-400 block">
@@ -93,6 +110,7 @@ async function StudioDetailContent({ params }: PageProps) {
                   </span>
                 </div>
 
+                {/* Hourly Rate */}
                 <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-center">
                   <DollarSign className="w-4 h-4 text-indigo-500 mx-auto mb-1" />
                   <span className="text-xs text-zinc-400 block">
@@ -130,12 +148,9 @@ async function StudioDetailContent({ params }: PageProps) {
             )}
           </div>
 
-          {/* Right Column: Booking Box (Client Component) & Host Details */}
+          {/* Right Column: Booking Box & Host Details */}
           <div className="space-y-6">
-            {/* Booking Box with Interactive Modal */}
-            <BookingBox
-              studio={studio}
-            />
+            <BookingBox studio={studio} />
 
             {/* Hosted By Section */}
             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-lg space-y-4">
@@ -147,8 +162,9 @@ async function StudioDetailContent({ params }: PageProps) {
                 <div className="w-12 h-12 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-950 border border-indigo-500/30 flex items-center justify-center font-bold text-sm text-indigo-600 dark:text-indigo-300 relative">
                   {studio?.userImage ? (
                     <Image
-                      src={studio?.userImage || studio?.userImage}
+                      src={studio?.userImage}
                       alt={studio?.userName || "Studio Host"}
+                      fill
                       className="w-full h-full object-cover"
                     />
                   ) : studio?.userName ? (
@@ -176,7 +192,6 @@ async function StudioDetailContent({ params }: PageProps) {
 }
 
 export default function StudioDetailPage({ params }: PageProps) {
-
   return (
     <Suspense
       fallback={
