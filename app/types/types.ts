@@ -7,6 +7,7 @@ export interface Istudio {
   maxCapacity: string;
   location: string;
   description: string;
+  rating: number;
   imageUrl: string;
   amenities: string[];
   userName: string;
