@@ -18,6 +18,7 @@ export interface IBooking {
   _id: string;
   studioId: string;
   studioTitle: string;
+  imageUrl?: string;
   date: string;
   hours: number;
   hourlyRate: number;
@@ -25,5 +26,5 @@ export interface IBooking {
   totalPrice: number;
   userName: string;
   userEmail: string;
-  status: "pending" | "confirmed" | "completed" | "cancelled" | string;
+  status: string;
 }

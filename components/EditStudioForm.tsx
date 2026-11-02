@@ -41,7 +41,7 @@ export default function EditStudioForm({ studio}: EditStudioFormProps) {
       body: JSON.stringify(UpdatedData),
     });
     const result = await res.json();
-    console.log(result);
+    
     if (result.modifiedCount > 0) {
       toast.success("Studio updated successfully!");
       router.push("/my-listings");

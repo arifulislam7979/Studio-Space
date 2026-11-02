@@ -3,11 +3,10 @@ import { headers } from "next/headers";
 import { Istudio } from "../types/types";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Plus, AlertCircle, Loader2 } from "lucide-react";
+import { MapPin, Plus, AlertCircle, Users, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ListingActions from "@/components/ListingActions";
 import { Suspense } from "react";
-
 
 const MyListingsContent = async () => {
   const session = await auth.api.getSession({
@@ -64,7 +63,7 @@ const MyListingsContent = async () => {
             {listings.map((studio) => (
               <div
                 key={studio._id}
-                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-between"
+                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-between hover:shadow-xl transition-all"
               >
                 <div>
                   <div className="relative h-48 w-full bg-zinc-200 dark:bg-zinc-800">
@@ -80,22 +79,46 @@ const MyListingsContent = async () => {
                         No Image
                       </div>
                     )}
+                    {/* Category Badge on Image */}
+                    {studio.category && (
+                      <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold uppercase tracking-wider">
+                        {studio.category}
+                      </span>
+                    )}
                   </div>
-                  <div className="p-5 space-y-2">
+
+                  <div className="p-5 space-y-3">
                     <h3 className="font-bold text-lg truncate text-zinc-900 dark:text-zinc-100">
                       {studio.title}
                     </h3>
+                    
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-indigo-500 shrink-0" />{" "}
+                      <MapPin className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                       <span className="truncate">{studio.location}</span>
                     </p>
-                    <p className="text-sm font-extrabold text-indigo-600 dark:text-indigo-400">
-                      ${studio.price}/hr
-                    </p>
+
+                    {/* Added Information: Max Capacity & Security Deposit */}
+                    <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
+                      <div className="flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5 text-indigo-500" />
+                        <span>Capacity: <strong className="text-zinc-700 dark:text-zinc-300">{studio.maxCapacity || "N/A"}</strong></span>
+                      </div>
+                      {studio.securityDeposit && (
+                        <span className="text-[11px] bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md font-medium">
+                          Deposit: ${studio.securityDeposit}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="pt-1">
+                      <p className="text-sm font-extrabold text-indigo-600 dark:text-indigo-400">
+                        ${studio.price}<span className="text-xs font-normal text-zinc-400">/hr</span>
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Edit and Delete Buttons Component */}
+                {/* Edit and Delete Actions Component */}
                 <div className="p-5 pt-0">
                   <ListingActions id={studio._id} />
                 </div>

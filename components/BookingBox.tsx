@@ -46,6 +46,7 @@ export default function BookingBox({ studio }: BookingBoxProps) {
     const bookingsData = {
       studioId,
       studioTitle,
+      imageUrl: studio?.imageUrl,
       date: bookingData.date,
       hours: hoursNum,
       hourlyRate,
