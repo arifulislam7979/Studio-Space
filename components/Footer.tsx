@@ -12,28 +12,34 @@ import {
   MessageSquare,
   AtSign,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function Footer() {
   return (
     <footer className="bg-zinc-950 text-zinc-400 border-t border-zinc-800/80 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* Main Grid Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-zinc-800/60">
-          
           {/* 1. Brand Column */}
           <div className="lg:col-span-2 space-y-5">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/20">
-                <Camera className="w-5 h-5" />
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/20 group-hover:scale-105 transition-transform shrink-0 overflow-hidden">
+                <Image
+                  src="/images/camera.png"
+                  alt="StudioSpace Logo"
+                  width={28}
+                  height={28}
+                  className="object-contain brightness-0 invert"
+                />
               </div>
               <span className="text-xl font-bold tracking-tight text-white">
                 Studio<span className="text-indigo-400">Space</span>
               </span>
             </Link>
-
             <p className="text-sm text-zinc-400 leading-relaxed max-w-sm">
-              The leading peer-to-peer marketplace connecting filmmakers, photographers, audio engineers, and podcasters with high-end production spaces.
+              The leading peer-to-peer marketplace connecting filmmakers,
+              photographers, audio engineers, and podcasters with high-end
+              production spaces.
             </p>
 
             {/* Newsletter Input */}
@@ -68,22 +74,34 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/" className="hover:text-indigo-400 transition-colors">
+                <Link
+                  href="/"
+                  className="hover:text-indigo-400 transition-colors"
+                >
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/studios" className="hover:text-indigo-400 transition-colors">
+                <Link
+                  href="/studios"
+                  className="hover:text-indigo-400 transition-colors"
+                >
                   All Studios
                 </Link>
               </li>
               <li>
-                <Link href="/#how-it-works" className="hover:text-indigo-400 transition-colors">
+                <Link
+                  href="/#how-it-works"
+                  className="hover:text-indigo-400 transition-colors"
+                >
                   How It Works
                 </Link>
               </li>
               <li>
-                <Link href="/#about-us" className="hover:text-indigo-400 transition-colors">
+                <Link
+                  href="/#about-us"
+                  className="hover:text-indigo-400 transition-colors"
+                >
                   About Us
                 </Link>
               </li>
@@ -97,22 +115,34 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/studios?category=recording" className="hover:text-indigo-400 transition-colors">
+                <Link
+                  href="/studios?category=recording"
+                  className="hover:text-indigo-400 transition-colors"
+                >
                   Recording Studios
                 </Link>
               </li>
               <li>
-                <Link href="/studios?category=podcast" className="hover:text-indigo-400 transition-colors">
+                <Link
+                  href="/studios?category=podcast"
+                  className="hover:text-indigo-400 transition-colors"
+                >
                   Podcast Lounges
                 </Link>
               </li>
               <li>
-                <Link href="/studios?category=photo" className="hover:text-indigo-400 transition-colors">
+                <Link
+                  href="/studios?category=photo"
+                  className="hover:text-indigo-400 transition-colors"
+                >
                   Photo Cyc Walls
                 </Link>
               </li>
               <li>
-                <Link href="/studios?category=film" className="hover:text-indigo-400 transition-colors">
+                <Link
+                  href="/studios?category=film"
+                  className="hover:text-indigo-400 transition-colors"
+                >
                   Film Sound Stages
                 </Link>
               </li>
@@ -139,14 +169,11 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
         </div>
 
         {/* Bottom Bar: Copyright & Social Links */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-          <p>
-            © 2026 StudioSpace Platform Inc. All rights reserved.
-          </p>
+          <p>© 2026 StudioSpace Platform Inc. All rights reserved.</p>
 
           <div className="flex items-center gap-4">
             <a
@@ -187,7 +214,6 @@ export default function Footer() {
             </a>
           </div>
         </div>
-
       </div>
     </footer>
   );

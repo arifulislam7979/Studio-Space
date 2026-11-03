@@ -21,8 +21,7 @@ export default function Hero() {
       subtitle:
         "Fully equipped professional recording studios with advanced mixing consoles and high-end acoustic treatment.",
       badge: "Acoustic Recording Suite",
-      bgImage:
-        "https://static.vecteezy.com/system/resources/thumbnails/036/483/161/small/ai-generated-interior-of-a-recording-studio-with-lots-of-equipment-ai-generative-photo.jpg",
+      bgImage: "/images/hero1-image.jpg",
     },
     {
       id: 2,
@@ -30,8 +29,7 @@ export default function Hero() {
       subtitle:
         "Modern broadcast setups and podcast recording booths designed for crystal-clear audio production.",
       badge: "Podcast & Broadcast Lounge",
-      bgImage:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf_8_qfkjUTT2BWGotx07BWz0PrA8kLXXQAzfiHMwMfg&s=10",
+      bgImage: "/images/hero2-image.jpg",
     },
     {
       id: 3,
@@ -39,8 +37,7 @@ export default function Hero() {
       subtitle:
         "Spacious production studios and creative workspace setups tailored for filmmakers, musicians, and creators.",
       badge: "Creative Production Hub",
-      bgImage:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSryEKuOqheIubQL1j_rRA2gYaTtgTNPQSWPF7ZzZoJ9A&s=10",
+      bgImage: "/images/hero3-image.jpg",
     },
   ];
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Camera, Sun, Moon, Menu, X } from "lucide-react";
+import { Sun, Moon, Menu, X } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth-client";
 import UserInfo from "./UserInfo";
+import Image from "next/image";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -16,14 +17,30 @@ export default function Navbar() {
 
   const user = session?.user;
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "dark") {
+        setIsDarkMode(true);
+        document.documentElement.classList.add("dark");
+      } else {
+        setIsDarkMode(false);
+        document.documentElement.classList.remove("dark");
+      }
+    },0);
+    return ()=> clearTimeout(timer)
+  }, []);
+
   const toggleTheme = () => {
     const newTheme = !isDarkMode;
     setIsDarkMode(newTheme);
     if (newTheme) {
       document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
       toast.success("Dark mode enabled");
     } else {
       document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
       toast.success("Light mode enabled");
     }
   };
@@ -41,8 +58,14 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* 1. Left Side: Brand Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform shrink-0">
-              <Camera className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl bg-blue-600 dark:bg-blue-700 flex items-center justify-center shadow-md shadow-blue-500/30 group-hover:scale-105 transition-transform shrink-0 overflow-hidden p-2">
+              <Image
+                src="/images/camera.png"
+                alt="Logo"
+                width={28}
+                height={28}
+                className="object-contain brightness-0 invert"
+              />
             </div>
             <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
               Studio
@@ -51,7 +74,6 @@ export default function Navbar() {
               </span>
             </span>
           </Link>
-
           {/* 2. Middle: Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => {
@@ -81,9 +103,9 @@ export default function Navbar() {
               aria-label="Toggle Theme"
             >
               {isDarkMode ? (
-                <Sun className="w-5 h-5" />
+                <Sun className="w-5 h-5 text-amber-400" />
               ) : (
-                <Moon className="w-5 h-5" />
+                <Moon className="w-5 h-5 text-zinc-700" />
               )}
             </button>
 
@@ -122,9 +144,9 @@ export default function Navbar() {
               aria-label="Toggle Theme"
             >
               {isDarkMode ? (
-                <Sun className="w-5 h-5" />
+                <Sun className="w-5 h-5 text-amber-400" />
               ) : (
-                <Moon className="w-5 h-5" />
+                <Moon className="w-5 h-5 text-zinc-700" />
               )}
             </button>
 

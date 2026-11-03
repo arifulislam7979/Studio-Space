@@ -10,14 +10,14 @@ import {
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { 
-  LogOut, 
-  Loader2, 
-  User as UserIcon, 
-  ChevronDown, 
-  PlusCircle, 
-  Layers, 
-  CalendarCheck 
+import {
+  LogOut,
+  Loader2,
+  User as UserIcon,
+  ChevronDown,
+  PlusCircle,
+  Layers,
+  CalendarCheck,
 } from "lucide-react";
 import { signOut } from "@/lib/auth-client";
 import { toast } from "sonner";
@@ -35,7 +35,8 @@ interface UserInfoProps {
 const UserInfo = ({ user }: UserInfoProps) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  
+  const [open, setOpen] = useState(false);
+
   const handleSignOut = async () => {
     setLoading(true);
     try {
@@ -51,9 +52,9 @@ const UserInfo = ({ user }: UserInfoProps) => {
 
   return (
     <div className="flex items-center gap-3">
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         {/* Avatar + Name Trigger Button */}
-        <PopoverTrigger>
+        <PopoverTrigger >
           <span className="flex items-center gap-2 p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-all focus:outline-none group cursor-pointer">
             <Avatar className="w-9 h-9 border-2 border-indigo-500/30 group-hover:border-indigo-600 dark:group-hover:border-indigo-400 transition-all shrink-0">
               <AvatarImage
@@ -70,12 +71,14 @@ const UserInfo = ({ user }: UserInfoProps) => {
               </AvatarFallback>
             </Avatar>
 
-            {/* User Name and Dropdown Icon (Hidden on very small screens, visible on sm+) */}
+            {/* User Name and Dropdown Icon */}
             <div className="hidden sm:flex items-center gap-1.5 pr-1">
               <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors max-w-25 truncate">
                 {user?.name || "User"}
               </span>
-              <ChevronDown className="w-4 h-4 text-zinc-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-transform duration-200" />
+              <ChevronDown
+                className={`w-4 h-4 text-zinc-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-450 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+              />
             </div>
           </span>
         </PopoverTrigger>
@@ -95,10 +98,10 @@ const UserInfo = ({ user }: UserInfoProps) => {
             </p>
           </div>
 
-          {/* Navigation Links */}
           <div className="py-2 space-y-1">
             <Link
               href="/add-studio"
+              onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
             >
               <PlusCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -107,6 +110,7 @@ const UserInfo = ({ user }: UserInfoProps) => {
 
             <Link
               href="/my-listings"
+              onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
             >
               <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -115,6 +119,7 @@ const UserInfo = ({ user }: UserInfoProps) => {
 
             <Link
               href="/my-bookings"
+              onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
             >
               <CalendarCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
