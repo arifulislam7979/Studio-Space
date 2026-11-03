@@ -15,6 +15,7 @@ import { Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { getTokenFromClient } from "@/lib/getTokenClient";
 
 interface ListingActionsProps {
   id: string;
@@ -24,9 +25,16 @@ export default function ListingActions({ id }: ListingActionsProps) {
   const router = useRouter();
 
   const handleDelete = async () => {
-    const res = await fetch(`http://localhost:5000/add-studio/${id}`, {
-      method: "DELETE",
-    });
+    const token = await getTokenFromClient()
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/add-studio/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      },
+    );
     const result = await res.json();
 
     if (result.deletedCount > 0) {
@@ -47,7 +55,7 @@ export default function ListingActions({ id }: ListingActionsProps) {
           <Edit className="w-3.5 h-3.5" /> Edit
         </Button>
       </Link>
-      
+
       <AlertDialog>
         <AlertDialogTrigger
           nativeButton={false}
@@ -67,8 +75,15 @@ export default function ListingActions({ id }: ListingActionsProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-            <AlertDialogAction className='text-white cursor-pointer bg-red-500' onClick={handleDelete}>Continue</AlertDialogAction>
+            <AlertDialogCancel className="cursor-pointer">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="text-white cursor-pointer bg-red-500"
+              onClick={handleDelete}
+            >
+              Continue
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

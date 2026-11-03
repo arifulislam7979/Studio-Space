@@ -23,7 +23,7 @@ const DataChild = async ({ searchParams }: DataChildProps) => {
   let studios: Istudio[] = [];
 
   try {
-    let url = "http://localhost:5000/add-studio";
+    let url = `${process.env.NEXT_PUBLIC_API_URL}/add-studio`;
     if (category) {
       url += `?category=${encodeURIComponent(category)}`;
     }

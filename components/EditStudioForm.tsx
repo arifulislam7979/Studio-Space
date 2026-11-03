@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Istudio } from "@/app/types/types";
+import { getTokenFromClient } from "@/lib/getTokenClient";
 
 interface EditStudioFormProps {
   studio: Istudio;
@@ -32,11 +33,13 @@ export default function EditStudioForm({ studio}: EditStudioFormProps) {
     const {_id, ...UpdatedData} = formData
     void _id
     setSubmitting(true);
-
-    const res = await fetch(`http://localhost:5000/add-studio/${studio._id}`, {
+    
+    const token = await getTokenFromClient()
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-studio/${studio._id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        authorization: `Bearer ${token}`
       },
       body: JSON.stringify(UpdatedData),
     });

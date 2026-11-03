@@ -32,6 +32,9 @@ export default function BookingBox({ studio }: BookingBoxProps) {
   const handleBookClick = () => {
     if (!session?.user) {
       toast.error("Please sign in to book a workspace.");
+      
+      const currentPath = window.location.pathname;
+      router.push(`/signin?callbackUrl=${encodeURIComponent(currentPath)}`);
       return;
     }
     setIsModalOpen(true);
@@ -74,7 +77,7 @@ export default function BookingBox({ studio }: BookingBoxProps) {
       status: "Pending", 
     };
 
-      const res = await fetch("http://localhost:5000/add-bookings", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

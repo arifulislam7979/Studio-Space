@@ -10,7 +10,7 @@ interface PageProps {
 async function EditStudioContent({ params }: PageProps) {
   const { id } = await params;
 
-  const res = await fetch(`http://localhost:5000/add-studio/${id}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-studio/${id}`, {
     cache: "no-store",
   });
   const studio: Istudio = await res.json();

@@ -1,8 +1,9 @@
+
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Camera,
   Mail,
@@ -18,7 +19,10 @@ import { Button } from "@/components/ui/button";
 import GoogleIcon from "@/components/GoogleIcon";
 
 export default function SignInPage() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const router = useRouter();
+  
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -48,7 +52,8 @@ export default function SignInPage() {
 
     if (data) {
       toast.success("Sign In Successfully");
-      router.push("/");
+      router.push(callbackUrl);
+      router.refresh();
     }
     if (error) {
       toast.error(
@@ -57,17 +62,16 @@ export default function SignInPage() {
     }
   };
 
-  // Google Social Sign-In Handler
+  // Google Social Sign-In Handler with callbackUrl support
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/",
+        callbackURL: callbackUrl, // গুগল লগইনের পরেও যেন নির্দিষ্ট callbackUrl-এ ফিরে যায়
       });
     } catch (e) {
-      toast.error( "Google Sign-In Failed. Try again.",);
-    } finally {
+      toast.error("Google Sign-In Failed. Try again.");
       setGoogleLoading(false);
     }
   };

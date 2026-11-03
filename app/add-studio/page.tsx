@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
+import { getTokenFromClient } from "@/lib/getTokenClient";
 
 const AMENITIES_OPTIONS = [
   { id: "wifi", label: "High-speed Wi-Fi", icon: Wifi },
@@ -94,11 +95,12 @@ export default function AddStudiosPage() {
       userEmail: user?.email,
       userImage: user?.image
     };
-
-    const res = await fetch("http://localhost:5000/add-studio", {
+    const token = await getTokenFromClient()
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-studio`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        authorization: `Bearer ${token}`
       },
       body: JSON.stringify(studioUser),
     });

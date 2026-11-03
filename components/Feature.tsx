@@ -10,7 +10,7 @@ const FeatureContent = async () => {
 
   try {
     const res = await fetch(
-      "http://localhost:5000/featured-studios",
+      `${process.env.NEXT_PUBLIC_API_URL}/featured-studios`,
       {
         cache: "no-store",
       },

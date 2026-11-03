@@ -15,6 +15,7 @@ import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState } from "react";
+import { getTokenFromClient } from "@/lib/getTokenClient";
 
 interface CancelBookingProps {
   bookingId: string;
@@ -26,13 +27,15 @@ export default function CancelBooking({ bookingId }: CancelBookingProps) {
 
   const handleCancel = async () => {
     setLoading(true);
+    const token = await getTokenFromClient()
     try {
       const res = await fetch(
-        `http://localhost:5000/cancel-booking/${bookingId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/cancel-booking/${bookingId}`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ status: "Cancelled" }),
         },

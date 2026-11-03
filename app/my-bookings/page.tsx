@@ -6,6 +6,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { IBooking } from "../types/types";
 import CancelBooking from "@/components/CancelBooking";
+import { getTokenFromServer } from "@/lib/getTokenServer";
 
 const MyBookingsContent = async () => {
   const session = await auth.api.getSession({
@@ -16,12 +17,18 @@ const MyBookingsContent = async () => {
   if (!user?.email) {
     redirect("/login");
   }
-
+  const token = await getTokenFromServer()
   let bookings: IBooking[] = [];
   try {
-    const res = await fetch(`http://localhost:5000/my-bookings/${user.email}`, {
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/my-bookings/${user.email}`,
+      {
+        cache: "no-store",
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      },
+    );
     if (res.ok) {
       bookings = await res.json();
     }

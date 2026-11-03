@@ -7,6 +7,7 @@ import { MapPin, Plus, AlertCircle, Users, Star, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ListingActions from "@/components/ListingActions";
 import { Suspense } from "react";
+import { getTokenFromServer } from "@/lib/getTokenServer";
 
 const MyListingsContent = async () => {
   const session = await auth.api.getSession({
@@ -21,9 +22,12 @@ const MyListingsContent = async () => {
       </div>
     );
   }
-
-  const res = await fetch(`http://localhost:5000/my-listings/${user?.email}`, {
+  const token = await getTokenFromServer()
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/my-listings/${user?.email}`, {
     cache: "no-store",
+    headers: {
+      authorization: `Bearer ${token}`
+    }
   });
   const listings: Istudio[] = await res.json();
 
