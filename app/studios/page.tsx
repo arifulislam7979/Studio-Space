@@ -19,8 +19,7 @@ interface DataChildProps {
 }
 
 const DataChild = async ({ searchParams }: DataChildProps) => {
-  const { category } = await searchParams;
-
+  const {category}  = await searchParams;
   let studios: Istudio[] = [];
 
   try {

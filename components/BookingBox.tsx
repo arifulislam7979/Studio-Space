@@ -17,9 +17,11 @@ export default function BookingBox({ studio }: BookingBoxProps) {
   const { data: session } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const [bookingData, setBookingData] = useState({
-    date: "",
-    hours: "2",
+    date: new Date().toISOString().split("T")[0],
+    startTime: "10:00",
+    endTime: "12:00",
   });
 
   const studioId = studio?._id;
@@ -35,12 +37,25 @@ export default function BookingBox({ studio }: BookingBoxProps) {
     setIsModalOpen(true);
   };
 
-  const hoursNum = parseInt(bookingData.hours) || 0;
-  const rentalTotal = hoursNum * hourlyRate;
+  const startDateTime = new Date(
+    `${bookingData.date}T${bookingData.startTime}`,
+  );
+  const endDateTime = new Date(`${bookingData.date}T${bookingData.endTime}`);
+
+  const diffMs = endDateTime.getTime() - startDateTime.getTime();
+  const calculatedHours = diffMs > 0 ? Math.ceil(diffMs / (1000 * 60 * 60)) : 0;
+
+  const rentalTotal = calculatedHours * hourlyRate;
   const grandTotal = rentalTotal + securityDeposit;
 
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (calculatedHours <= 0) {
+      toast.error("End time must be after the start time.");
+      return;
+    }
+
     setLoading(true);
 
     const bookingsData = {
@@ -48,31 +63,44 @@ export default function BookingBox({ studio }: BookingBoxProps) {
       studioTitle,
       imageUrl: studio?.imageUrl,
       date: bookingData.date,
-      hours: hoursNum,
+      startTime: startDateTime.toISOString(),
+      endTime: endDateTime.toISOString(),
+      hours: calculatedHours,
       hourlyRate,
       securityDeposit,
       totalPrice: grandTotal,
       userName: session?.user?.name,
       userEmail: session?.user?.email,
-      status: "pending",
+      status: "Pending", 
     };
-    const res = await fetch("http://localhost:5000/add-bookings", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(bookingsData),
-    });
-    const result = await res.json();
-    if (result.insertedId) {
-      toast.success("Booking confirmed!");
-      setIsModalOpen(false);
-      router.push('/my-bookings')
-    } else {
-      toast.error("Failed to book workspace. Please try again.");
-    }
-  };
 
+      const res = await fetch("http://localhost:5000/add-bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingsData),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        toast.error(
+          result.message || "Conflict! Selected time is already booked.",
+        );
+        setLoading(false);
+        return;
+      }
+
+      if (result.insertedId) {
+        toast.success("Booking confirmed!");
+        setIsModalOpen(false);
+        router.push("/my-bookings");
+      } else {
+        toast.error("Failed to book workspace. Please try again.");
+      }
+    
+  };
   return (
     <>
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-xl space-y-6 sticky top-24">
@@ -106,7 +134,7 @@ export default function BookingBox({ studio }: BookingBoxProps) {
         </button>
       </div>
 
-      {/* Modal Popup */}
+      {/* Modal Popup with Input Fields */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative space-y-6">
@@ -119,7 +147,7 @@ export default function BookingBox({ studio }: BookingBoxProps) {
 
             <div className="space-y-1">
               <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                Studio Reservation
+                STUDIO RESERVATION
               </span>
               <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight truncate">
                 {studioTitle}
@@ -130,9 +158,10 @@ export default function BookingBox({ studio }: BookingBoxProps) {
             </div>
 
             <form onSubmit={handleBookingSubmit} className="space-y-4">
+              {/* Date Input Field */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-                  Booking Date <span className="text-red-500">*</span>
+                  BOOKING DATE <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
@@ -150,32 +179,61 @@ export default function BookingBox({ studio }: BookingBoxProps) {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-                  Duration (Hours) <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
-                    <Clock className="w-4 h-4" />
+              {/* Start Time & End Time Input Fields */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                    START TIME <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="time"
+                      required
+                      value={bookingData.startTime}
+                      onChange={(e) =>
+                        setBookingData({
+                          ...bookingData,
+                          startTime: e.target.value,
+                        })
+                      }
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                    />
                   </div>
-                  <input
-                    type="number"
-                    min="1"
-                    max="24"
-                    required
-                    value={bookingData.hours}
-                    onChange={(e) =>
-                      setBookingData({ ...bookingData, hours: e.target.value })
-                    }
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
-                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                    END TIME <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="time"
+                      required
+                      value={bookingData.endTime}
+                      onChange={(e) =>
+                        setBookingData({
+                          ...bookingData,
+                          endTime: e.target.value,
+                        })
+                      }
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                    />
+                  </div>
                 </div>
               </div>
 
+              {/* Price Calculation Box */}
               <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-950/70 border border-zinc-200 dark:border-zinc-800 space-y-2 text-xs">
                 <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
                   <span>
-                    Rate ({hoursNum} hrs × ${hourlyRate}):
+                    Rate ({calculatedHours > 0 ? calculatedHours : 0} hrs × $
+                    {hourlyRate}):
                   </span>
                   <span className="font-semibold">${rentalTotal}</span>
                 </div>
@@ -194,13 +252,13 @@ export default function BookingBox({ studio }: BookingBoxProps) {
               <div className="pt-2">
                 <Button
                   type="submit"
-                  disabled={loading}
-                  className="w-full py-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  disabled={loading || calculatedHours <= 0}
+                  className="w-full py-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
                 >
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Confirming Booking...</span>
+                      <span>Checking Availability...</span>
                     </>
                   ) : (
                     <>

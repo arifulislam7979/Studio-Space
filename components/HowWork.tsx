@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Search, CalendarClock, CreditCard, Clapperboard } from "lucide-react";
@@ -38,17 +37,20 @@ export default function HowWork() {
   return (
     <section id="how-it-works" className="py-20 bg-zinc-50 dark:bg-zinc-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* Section Heading */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <span className="text-xs font-bold tracking-widest text-indigo-600 dark:text-indigo-400 uppercase">
             Simple 4-Step Process
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
-            How Booking Works on <span className="text-indigo-600 dark:text-indigo-400">StudioSpace</span>
+            How Booking Works on{" "}
+            <span className="text-indigo-600 dark:text-indigo-400">
+              StudioSpace
+            </span>
           </h2>
           <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400">
-            From discovering high-end gear setups to stepping inside your reserved stage — renting creative space has never been easier.
+            From discovering high-end gear setups to stepping inside your
+            reserved stage — renting creative space has never been easier.
           </p>
         </div>
 
@@ -84,7 +86,6 @@ export default function HowWork() {
             );
           })}
         </div>
-
       </div>
     </section>
   );
