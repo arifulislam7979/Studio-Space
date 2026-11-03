@@ -7,14 +7,12 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Istudio } from "@/app/types/types";
-import { getTokenFromClient } from "@/lib/getTokenClient";
 
 interface EditStudioFormProps {
   studio: Istudio;
-  
 }
 
-export default function EditStudioForm({ studio}: EditStudioFormProps) {
+export default function EditStudioForm({ studio }: EditStudioFormProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState(studio);
@@ -22,29 +20,30 @@ export default function EditStudioForm({ studio}: EditStudioFormProps) {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setFormData({ 
-        ...formData,
-        [e.target.name]: e.target.value
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const {_id, ...UpdatedData} = formData
-    void _id
+    const { _id, ...UpdatedData } = formData;
+    void _id;
     setSubmitting(true);
-    
-    const token = await getTokenFromClient()
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-studio/${studio._id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: `Bearer ${token}`
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/add-studio/${studio._id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(UpdatedData),
       },
-      body: JSON.stringify(UpdatedData),
-    });
+    );
     const result = await res.json();
-    
+
     if (result.modifiedCount > 0) {
       toast.success("Studio updated successfully!");
       router.push("/my-listings");

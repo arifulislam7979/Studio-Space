@@ -1,5 +1,6 @@
 import { Istudio } from "@/app/types/types";
 import EditStudioForm from "@/components/EditStudioForm";
+import { getTokenFromServer } from "@/lib/getTokenServer";
 import { Loader2 } from "lucide-react";
 import { Suspense } from "react";
 
@@ -8,10 +9,13 @@ interface PageProps {
 }
 
 async function EditStudioContent({ params }: PageProps) {
+  const token = await getTokenFromServer()
   const { id } = await params;
-
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-studio/${id}`, {
     cache: "no-store",
+    headers: {
+      authorization: `Bearer ${token}`, 
+    },
   });
   const studio: Istudio = await res.json();
 

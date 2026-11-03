@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import ListingActions from "@/components/ListingActions";
 import { Suspense } from "react";
 import { getTokenFromServer } from "@/lib/getTokenServer";
+import { notFound } from "next/navigation";
 
 const MyListingsContent = async () => {
   const session = await auth.api.getSession({
@@ -29,6 +30,9 @@ const MyListingsContent = async () => {
       authorization: `Bearer ${token}`
     }
   });
+  if(!res.ok){
+    notFound()
+  }
   const listings: Istudio[] = await res.json();
 
   return (
