@@ -78,6 +78,7 @@ export default function EditStudioForm({ studio }: EditStudioFormProps) {
 
     if (result.modifiedCount > 0 || res.ok) {
       toast.success("Studio updated successfully!");
+      setSubmitting(false);
       router.push("/my-listings");
       router.refresh();
     } else {
