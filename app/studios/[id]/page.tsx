@@ -16,16 +16,20 @@ import { Suspense } from "react";
 import BookingBox from "@/components/BookingBox";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { getTokenFromServer } from "@/lib/getTokenServer";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
 async function StudioDetailContent({ params }: PageProps) {
-  
+  const token = await getTokenFromServer()
   const { id } = await params;
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-studio/${id}`, {
     cache: "no-store",
+    headers: {
+      authorization: `Bearer ${token}`
+    }
   });
 
   if (!res.ok) {

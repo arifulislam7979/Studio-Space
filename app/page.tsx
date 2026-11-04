@@ -1,10 +1,10 @@
-import AboutPage from "@/components/About";
-import Feature from "@/components/Feature";
+import AboutPage from "@/components/HomePage/About";
+import Feature from "@/components/HomePage/Feature";
 
-import Hero from "@/components/Hero";
-import HostGuarantee from "@/components/HostGuarentee";
-import HowWork from "@/components/HowWork";
-import StudioCategories from "@/components/StudioCategories";
+import Hero from "@/components/HomePage/Hero";
+import HostGuarantee from "@/components/HomePage/HostGuarentee";
+import HowWork from "@/components/HomePage/HowWork";
+import StudioCategories from "@/components/HomePage/StudioCategories";
 
 export default function Home() {
   return (

@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { Camera, Film, Mic2, Music, Palette } from "lucide-react";
+import { Camera, Film, Mic2, Music } from "lucide-react";
 
 const categories = [
   { name: "Photo Studios", slug: "Photo Studio", icon: Camera, desc: "Cyc walls, lighting grids & natural light" },
   { name: "Sound Stages", slug: "Film Stage", icon: Film, desc: "Large format video & film production" },
   { name: "Podcast Lounge", slug: "Podcast Lounge", icon: Mic2, desc: "Acoustic treated recording booths" },
   { name: "Music Suites", slug: "Music Suite", icon: Music, desc: "Mixing, mastering & tracking spaces" },
-  { name: "Art Workshops", slug: "Workshop", icon: Palette, desc: "Open space for creative crafts & arts" },
 ];
 
 export default function StudioCategories() {
@@ -24,7 +23,7 @@ export default function StudioCategories() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {categories.map((cat) => {
           const Icon = cat.icon;
           return (
@@ -34,7 +33,7 @@ export default function StudioCategories() {
               className="group relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-500/40 dark:hover:border-indigo-500/40 transition-all duration-300 flex flex-col items-center text-center space-y-4 cursor-pointer overflow-hidden"
             >
               {/* Subtle background glow on hover */}
-              <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <div className="absolute inset-0 bg-linear-to-b from-indigo-500/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
               <div className="relative p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-inner">
                 <Icon className="w-6 h-6" />

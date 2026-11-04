@@ -135,9 +135,21 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 4. Call-to-Action (CTA) Banner */}
+      {/* 4. Call-to-Action (CTA) Banner with Background Image */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="relative rounded-3xl bg-indigo-600 dark:bg-indigo-950 border border-indigo-500/30 p-8 sm:p-12 overflow-hidden text-center text-white shadow-xl">
+        <div className="relative rounded-3xl overflow-hidden p-8 sm:p-12 text-center text-white shadow-xl">
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center z-0"
+            style={{ 
+              backgroundImage: `url('/images/about-img.jpg')` 
+            }}
+          />
+          
+          {/* Dark Overlay for better text readability */}
+          <div className="absolute inset-0 bg-indigo-950/85 dark:bg-zinc-950/90 z-0" />
+
+          {/* Content */}
           <div className="relative z-10 max-w-2xl mx-auto space-y-6">
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
               Ready to Book or Host Your Space?

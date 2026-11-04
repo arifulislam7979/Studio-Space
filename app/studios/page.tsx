@@ -9,6 +9,9 @@ import {
   Star,
   Sparkles,
   Loader2,
+  Film,
+  Mic2,
+  Music,
 } from "lucide-react";
 import { Istudio } from "../types/types"; 
 import Image from "next/image";
@@ -18,8 +21,17 @@ interface DataChildProps {
   searchParams: Promise<{ category?: string }>;
 }
 
+
+const categories = [
+  { name: "All Studios", slug: "", icon: Sparkles },
+  { name: "Photo Studio", slug: "Photo Studio", icon: Camera },
+  { name: "Film Stage", slug: "Film Stage", icon: Film },
+  { name: "Podcast Lounge", slug: "Podcast Lounge", icon: Mic2 },
+  { name: "Music Suite", slug: "Music Suite", icon: Music },
+];
+
 const DataChild = async ({ searchParams }: DataChildProps) => {
-  const {category}  = await searchParams;
+  const { category } = await searchParams;
   let studios: Istudio[] = [];
 
   try {
@@ -36,39 +48,46 @@ const DataChild = async ({ searchParams }: DataChildProps) => {
     console.error("Failed to fetch studios:", error);
   }
 
-  // Condition: If no studios found
-  if (!studios || studios.length === 0) {
-    return (
-      <div className="text-center py-20 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl space-y-4">
-        <Layers className="w-12 h-12 text-zinc-400 mx-auto" />
-        <h3 className="text-lg font-bold">No Studios Available Yet</h3>
-        <p className="text-sm text-zinc-500">
-          {category ? `No studios found for "${category}".` : "Check back later or list your own studio space."}
-        </p>
-        <div className="flex justify-center gap-3 pt-2">
-          {category && (
-            <Link
-              href="/studios"
-              className="inline-block px-5 py-2.5 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold hover:bg-zinc-300 dark:hover:bg-zinc-700 transition"
-            >
-              Clear Filter
-            </Link>
-          )}
-          <Link
-            href="/add-studio"
-            className="inline-block px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-md hover:bg-indigo-500 transition"
-          >
-            Add New Studio
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
+      
+      {/* Category Filter Buttons Bar */}
+     <div className="space-y-4 pb-2">
+        <div className="text-center">
+          <h2 className="text-lg font-bold text-zinc-800 dark:text-zinc-200 tracking-tight">
+            Select Studio Category
+          </h2>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Click a category below to filter studios instantly
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-2.5">
+          {categories.map((cat) => {
+            const Icon = cat.icon;
+            // Check if this category is currently active
+            const isActive = (!category && cat.slug === "") || category === cat.slug;
+
+            return (
+              <Link
+                key={cat.slug}
+                href={cat.slug ? `/studios?category=${encodeURIComponent(cat.slug)}` : "/studios"}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all border ${
+                  isActive
+                    ? "bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/30"
+                    : "bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/50"
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{cat.name}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Filter Status & Total Count Badge */}
-      <div className="flex justify-between items-center flex-wrap gap-2">
+      <div className="flex justify-between items-center flex-wrap gap-2 pt-2">
         {category ? (
           <div className="text-xs font-semibold px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900">
             Filtered by Category: <span className="underline">{category}</span>
@@ -85,101 +104,126 @@ const DataChild = async ({ searchParams }: DataChildProps) => {
         </div>
       </div>
 
-      {/* Studios Grid View */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {studios.map((studio) => (
-          <div
-            key={studio._id}
-            className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col justify-between group"
-          >
-            <div>
-              {/* Studio Image Container */}
-              <div className="relative h-48 w-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
-                {studio.imageUrl ? (
-                  <Image
-                    src={studio.imageUrl}
-                    alt={studio.title}
-                    fill
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-zinc-400">
-                    <Camera className="w-8 h-8" />
-                  </div>
-                )}
-                {/* Category Badge */}
-                <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-semibold">
-                  {studio.category}
-                </span>
-
-                {/* Rating Badge (Fallback to 4.9 if rating doesn't exist) */}
-                <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-bold text-zinc-800 dark:text-zinc-200 shadow-sm">
-                  <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                  <span>{studio.rating ? studio.rating.toFixed(1) : "4.9"}</span>
-                </div>
-              </div>
-
-              {/* Content Info */}
-              <div className="p-5 space-y-3">
-                <h3 className="text-lg font-bold truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                  {studio.title}
-                </h3>
-
-                <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-                  <MapPin className="w-4 h-4 text-indigo-500 shrink-0" />
-                  <span className="truncate">{studio.location}</span>
-                </div>
-
-                <p className="text-xs text-zinc-600 dark:text-zinc-300 line-clamp-2">
-                  {studio.description}
-                </p>
-
-                {/* Meta Info (Capacity & Deposit) */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800 text-xs text-zinc-500">
-                  <div className="flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-indigo-500" />
-                    <span>Capacity: {studio.maxCapacity}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <ShieldAlert className="w-3.5 h-3.5 text-indigo-500" />
-                    <span>Deposit: ${studio.securityDeposit}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Card Footer: Price & View Details Button */}
-            <div className="p-5 pt-0 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 mt-4">
-              <div>
-                <span className="text-xs text-zinc-400 uppercase tracking-wider block">
-                  Hourly Rate
-                </span>
-                <span className="text-lg font-extrabold text-indigo-600 dark:text-indigo-400">
-                  ${studio.price}
-                  <span className="text-xs font-normal text-zinc-500">
-                    /hr
-                  </span>
-                </span>
-              </div>
-
+      {/* Condition: If no studios found */}
+      {!studios || studios.length === 0 ? (
+        <div className="text-center py-20 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl space-y-4">
+          <Layers className="w-12 h-12 text-zinc-400 mx-auto" />
+          <h3 className="text-lg font-bold">No Studios Available Yet</h3>
+          <p className="text-sm text-zinc-500">
+            {category ? `No studios found for "${category}".` : "Check back later or list your own studio space."}
+          </p>
+          <div className="flex justify-center gap-3 pt-2">
+            {category && (
               <Link
-                href={`/studios/${studio._id}`}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all group-hover:translate-x-1"
+                href="/studios"
+                className="inline-block px-5 py-2.5 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold hover:bg-zinc-300 dark:hover:bg-zinc-700 transition"
               >
-                <span>View Details</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                Clear Filter
               </Link>
-            </div>
+            )}
+            <Link
+              href="/add-studio"
+              className="inline-block px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-md hover:bg-indigo-500 transition"
+            >
+              Add New Studio
+            </Link>
           </div>
-        ))}
-      </div>
+        </div>
+      ) : (
+        /* Studios Grid View */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {studios.map((studio) => (
+            <div
+              key={studio._id}
+              className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col justify-between group"
+            >
+              <div>
+                {/* Studio Image Container */}
+                <div className="relative h-48 w-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                  {studio.imageUrl ? (
+                    <Image
+                      src={studio.imageUrl}
+                      alt={studio.title}
+                      fill
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-zinc-400">
+                      <Camera className="w-8 h-8" />
+                    </div>
+                  )}
+                  {/* Category Badge */}
+                  <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-semibold">
+                    {studio.category}
+                  </span>
+
+                  {/* Rating Badge (Fallback to 4.9 if rating doesn't exist) */}
+                  <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-bold text-zinc-800 dark:text-zinc-200 shadow-sm">
+                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                    <span>{studio.rating ? studio.rating.toFixed(1) : "4.9"}</span>
+                  </div>
+                </div>
+
+                {/* Content Info */}
+                <div className="p-5 space-y-3">
+                  <h3 className="text-lg font-bold truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    {studio.title}
+                  </h3>
+
+                  <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                    <MapPin className="w-4 h-4 text-indigo-500 shrink-0" />
+                    <span className="truncate">{studio.location}</span>
+                  </div>
+
+                  <p className="text-xs text-zinc-600 dark:text-zinc-300 line-clamp-2">
+                    {studio.description}
+                  </p>
+
+                  {/* Meta Info (Capacity & Deposit) */}
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800 text-xs text-zinc-500">
+                    <div className="flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-indigo-500" />
+                      <span>Capacity: {studio.maxCapacity}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <ShieldAlert className="w-3.5 h-3.5 text-indigo-500" />
+                      <span>Deposit: ${studio.securityDeposit}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card Footer: Price & View Details Button */}
+              <div className="p-5 pt-0 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 mt-4">
+                <div>
+                  <span className="text-xs text-zinc-400 uppercase tracking-wider block">
+                    Hourly Rate
+                  </span>
+                  <span className="text-lg font-extrabold text-indigo-600 dark:text-indigo-400">
+                    ${studio.price}
+                    <span className="text-xs font-normal text-zinc-500">
+                      /hr
+                    </span>
+                  </span>
+                </div>
+
+                <Link
+                  href={`/studios/${studio._id}`}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all group-hover:translate-x-1"
+                >
+                  <span>View Details</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-
-
-const StudiosPage = ({searchParams}:DataChildProps) => {
+const StudiosPage = ({ searchParams }: DataChildProps) => {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 py-10 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -211,7 +255,7 @@ const StudiosPage = ({searchParams}:DataChildProps) => {
             </div>
           }
         >
-          <DataChild  searchParams={searchParams}/>
+          <DataChild searchParams={searchParams} />
         </Suspense>
       </div>
     </div>

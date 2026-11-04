@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { signIn, signUp } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import GoogleIcon from "@/components/GoogleIcon";
+import Image from "next/image";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function SignUpPage() {
   // Password Validation Conditions
   const hasMinLength = formData.password.length >= 6;
   const hasUppercase = /[A-Z]/.test(formData.password);
-  const hasNumber = /[0-9]/.test(formData.password);
+  const hasLowercase = /[a-z]/.test(formData.password);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -51,7 +52,7 @@ export default function SignUpPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!hasMinLength || !hasUppercase || !hasNumber) {
+    if (!hasMinLength || !hasUppercase || !hasLowercase) {
       toast.error("Please meet all password requirements!");
       return;
     }
@@ -67,7 +68,7 @@ export default function SignUpPage() {
       email: formData.email,
       password: formData.password,
       name: formData.name,
-      image: formData.image
+      image: formData.image,
     });
 
     setLoading(false);
@@ -103,7 +104,13 @@ export default function SignUpPage() {
             href="/"
             className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
           >
-            <Camera className="w-6 h-6" />
+            <Image
+              src="/images/camera.png"
+              alt="Logo"
+              width={28}
+              height={28}
+              className="object-contain brightness-0 invert"
+            />
           </Link>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
             Create an Account
@@ -189,6 +196,7 @@ export default function SignUpPage() {
               <input
                 type="url"
                 name="image"
+                required
                 value={formData.image}
                 onChange={handleChange}
                 placeholder="Image URL"
@@ -213,7 +221,7 @@ export default function SignUpPage() {
                 value={formData.password}
                 autoComplete="new-password"
                 onChange={handleChange}
-                placeholder="••••••••"
+                placeholder="Password"
                 className="w-full pl-10 pr-12 py-3 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
               />
               <button
@@ -262,17 +270,17 @@ export default function SignUpPage() {
               </div>
               <div
                 className={`flex items-center gap-1.5 ${
-                  hasNumber
+                  hasLowercase
                     ? "text-emerald-500 dark:text-emerald-400"
                     : "text-zinc-400 dark:text-zinc-500"
                 }`}
               >
-                {hasNumber ? (
+                {hasLowercase ? (
                   <Check className="w-3.5 h-3.5" />
                 ) : (
                   <X className="w-3.5 h-3.5" />
                 )}
-                <span>At least one number</span>
+                <span>At least one lowercase letter</span>
               </div>
             </div>
           </div>
@@ -292,7 +300,7 @@ export default function SignUpPage() {
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                placeholder="••••••••"
+                placeholder="Confirm Password"
                 className="w-full pl-10 pr-12 py-3 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
               />
               <button

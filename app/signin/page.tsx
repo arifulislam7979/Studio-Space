@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -17,12 +16,13 @@ import { toast } from "sonner";
 import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import GoogleIcon from "@/components/GoogleIcon";
+import Image from "next/image";
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -85,7 +85,13 @@ export default function SignInPage() {
             href="/"
             className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
           >
-            <Camera className="w-6 h-6" />
+            <Image
+              src="/images/camera.png"
+              alt="Logo"
+              width={28}
+              height={28}
+              className="object-contain brightness-0 invert"
+            />
           </Link>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
             Welcome Back
