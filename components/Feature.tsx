@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Istudio } from "@/app/types/types";
 import { Suspense } from "react";
 
-const FeatureContent = async () => {
+
+async function FeatureContent() {
   let featuredStudios: Istudio[] = [];
 
   try {
@@ -133,7 +134,7 @@ const FeatureContent = async () => {
       </div>
     </section>
   );
-};
+}
 
 export default function Feature() {
   return (
