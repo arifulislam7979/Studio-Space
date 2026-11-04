@@ -7,21 +7,12 @@ import { Suspense } from "react";
 
 
 async function FeatureContent() {
-  let featuredStudios: Istudio[] = [];
-
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/featured-studios`,
-      {
-        cache: "no-store",
-      },
-    );
-    if (res.ok) {
-      featuredStudios = await res.json();
-    }
-  } catch (err) {
-    console.error("Failed to fetch featured studios:", err);
-  }
+ 
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/featured-studios`,{
+    cache: 'no-store'
+  })
+  const featuredData:Istudio[] = await res.json()
+  
 
   return (
     <section className="py-12 px-4 sm:px-6 lg:px-8 bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors">
@@ -48,7 +39,7 @@ async function FeatureContent() {
         </div>
 
         {/* Studios Grid */}
-        {!featuredStudios || featuredStudios.length === 0 ? (
+        {!featuredData || featuredData.length === 0 ? (
           <div className="text-center py-16 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
               No featured studios available right now.
@@ -56,7 +47,7 @@ async function FeatureContent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredStudios.map((studio) => (
+            {featuredData.map((studio) => (
               <div
                 key={studio._id}
                 className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-between hover:shadow-xl transition-all group"
