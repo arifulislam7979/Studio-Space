@@ -10,6 +10,7 @@ import {
   User,
   Star,
   Loader2,
+  MessageSquare,
 } from "lucide-react";
 import { Istudio } from "@/app/types/types";
 import { Suspense } from "react";
@@ -17,23 +18,52 @@ import BookingBox from "@/components/BookingBox";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+interface Review {
+  id?: string;
+  userName: string;
+  rating: number;
+  date?: string;
+  comment: string;
+}
+// Sample Reviews (if backend doesn't return reviews array)
+const sampleReviews = [
+  {
+    id: "1",
+    userName: "Alex Rivera",
+    rating: 5,
+    date: "2 days ago",
+    comment:
+      "Exceptional space! The lighting equipment was top-tier and the acoustics were perfectly treated for our shoot.",
+  },
+  {
+    id: "2",
+    userName: "Sarah Chen",
+    rating: 4.8,
+    date: "1 week ago",
+    comment:
+      "Very clean studio and super responsive host. Will definitely book again for my next project.",
+  },
+];
+
 async function StudioDetailContent({ params }: PageProps) {
-  
   const { id } = await params;
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-studio/${id}`, {
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/add-studio/${id}`,
+    {
+      cache: "no-store",
+    },
+  );
 
   if (!res.ok) {
     notFound();
   }
 
   const studio: Istudio = await res.json();
+  const reviews = sampleReviews;
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 py-10 px-4 sm:px-6 lg:px-8 transition-colors">
@@ -148,6 +178,63 @@ async function StudioDetailContent({ params }: PageProps) {
                 </div>
               </div>
             )}
+
+            {/* Simple User Reviews Section (Without Form or Image) */}
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-lg space-y-6">
+              <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-indigo-500" />
+                  <h3 className="text-lg font-bold">User Reviews</h3>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-semibold border border-indigo-200/50 dark:border-indigo-800/50">
+                    {reviews.length}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 text-sm font-bold text-amber-500">
+                  <Star className="w-4 h-4 fill-amber-500" />
+                  <span>
+                    {studio?.rating ? studio.rating.toFixed(1) : "4.9"} / 5.0
+                  </span>
+                </div>
+              </div>
+
+              {/* Reviews List */}
+              <div className="space-y-4">
+                {reviews.map((rev: Review, idx: number) => (
+                  <div
+                    key={idx}
+                    className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-indigo-500" />
+                        <p className="text-xs font-bold">{rev.userName}</p>
+                        <span className="text-[10px] text-zinc-400">
+                          • {rev.date || "Verified Guest"}
+                        </span>
+                      </div>
+
+                      {/* Rating Stars */}
+                      <div className="flex items-center gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-3.5 h-3.5 ${
+                              i < Math.floor(rev.rating || 5)
+                                ? "text-amber-500 fill-amber-500"
+                                : "text-zinc-300 dark:text-zinc-700"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed pl-6">
+                      {rev.comment}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Right Column: Booking Box & Host Details */}
@@ -161,7 +248,7 @@ async function StudioDetailContent({ params }: PageProps) {
               </h3>
 
               <div className="flex items-center gap-3 pt-2">
-                <div className="w-12 h-12 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-950 border border-indigo-500/30 flex items-center justify-center font-bold text-sm text-indigo-600 dark:text-indigo-300 relative">
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-950 border border-indigo-500/30 flex items-center justify-center font-bold text-sm text-indigo-600 dark:text-indigo-300 relative shrink-0">
                   {studio?.userImage ? (
                     <Image
                       src={studio?.userImage}
